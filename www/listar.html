@@ -1,0 +1,204 @@
+﻿<!doctype html>  
+<html lang="es">  
+<head>  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Nevera</title>
+	<link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+	<script src="js/angular.min.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	
+</head>  
+<body>  
+	<div data-ng-app="myApp" class='container' data-ng-controller='getLoginData'>
+	
+	
+	<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+	 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar"> <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>      
+		</button>
+      <a class="navbar-brand" href="#">Cajones</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href="/" data-ng-show="notlogged">Login</a></li>
+        <li><a href="/Registro.html" data-ng-show="notlogged">Registro</a></li>
+        <li><a href="/listar.html" data-ng-hide="notlogged">Listar</a></li>
+        <li><a data-ng-click="logOut()" data-ng-hide="notlogged">LogOut</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>		
+
+
+<div data-ng-hide="notlogged" class='well'>		
+<div class='table-responsive' data-ng-controller='getDrawersContent'>
+<table class='table'>
+<thead>
+<tr>
+<th>Cajón</th>
+<th>Producto</th>
+<th>Cantidad</th>
+<th>Eliminar</th>
+</tr>
+</thead>
+<tbody>
+  <tr ng-repeat="x in drawers | orderBy:'drawer'">
+  
+    <td>{{ x.drawer }}</td>
+    <td>{{ x.product }}</td>
+	<td>{{ x.quantity }}</td>
+	<td><button type="button" value={{x}} ng-click='delete(x)' class="btn btn-danger">Eliminar</button></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<form name='myform' data-ng-controller='loadDrawers' data-ng-submit="sendProduct()" novalidate>
+<fieldset>
+		<div class="form-group">
+		<label for='cajon'>Cajón:</label><br>
+		<select   class="form-control"  name='drawer' ng-model='content.drawer' ng-options="drawer.drawer as drawer.drawer for drawer in drawersNumber" required/>
+		</select>
+		</div>
+		<div class="form-group">
+		<label for='content'>Producto:</label><br>
+		<input type='text' placeholder="Producto" class="form-control" id='content' name='content' ng-model="content.product" required/>
+		</div>
+		<div class="form-group">
+		<label for='quantity'>Cantidad:</label><br>
+		<input type='number'  class="form-control" id='quantity' name='quantity' ng-model="content.quantity" min="0" max="25" placeholder="1" required/>
+		<br>
+		<div role="alert" class="alert alert-danger" ng-show="myform.quantity.$error.number">
+		No es un número !
+		</div>
+		<div role="alert" class="alert alert-danger" ng-show="myform.quantity.$error.max || myform.quantity.$error.min">
+		No es un número válido, debe tener un valor entre 1 y 25!
+		</div>
+		</div>
+	
+		<div class="form-group">
+		<button  type='submit' class="btn btn-success form-control center-block" ng-disabled="myform.$error.required || myform.$invalid" value='Enviar' id='enviar')/>Añadir</button>
+		</div>		
+	</fieldset>
+</form>
+
+
+</div>		
+	
+	<div class=" well" data-ng-show="notlogged">
+	<center><h1><a href='/'>Identificate</a></h1></center>
+	
+	</div>   
+	</div>   
+
+	<script>
+	var app = angular.module('myApp', [])
+	var loadeduser;
+app.controller('getLoginData', function ($scope, $http) {
+     
+	$scope.logged = false;
+	$scope.user;
+	//$scope.content.name="ss";
+ loadeduser = JSON.parse(localStorage.getItem('user'));
+	
+	if (loadeduser == null)
+	{
+	$scope.notlogged = true;
+	}
+	
+$scope.delete = function(data2delete){
+console.log(data2delete);
+var data2send = {};
+data2send['name'] = loadeduser.name;
+data2send['password'] = loadeduser.password;
+data2send['drawer'] = data2delete.drawer;
+data2send['product'] = data2delete.product;
+console.log(data2send);
+$http({url:"/delete",
+		 method: "POST",
+		 headers: {'Content-Type': 'application/json'},
+		data:JSON.stringify(data2send)})
+		.success(function(data, status) {
+			if (data)
+			{
+				location.reload();
+			}
+        })
+
+};	
+
+$scope.login = function (){
+$http({url:"/LogIn",
+		 method: "POST",
+		 headers: {'Content-Type': 'application/json'},
+		data:JSON.stringify($scope.user)})
+		.success(function(data, status) {
+           if (data)
+		   {
+			localStorage.setItem('user',JSON.stringify($scope.user));
+			$scope.notlogged = false;
+			}
+        })
+
+};
+
+$scope.logOut = function (){
+	localStorage.removeItem('user');
+		$scope.notlogged = true;
+		$scope.user = null;
+
+};
+
+$scope.sendProduct = function (){
+var data2send = {};
+data2send['name'] = loadeduser.name;
+data2send['password'] = loadeduser.password;
+data2send['drawer'] = this.content.drawer;
+data2send['product'] = this.content.product;
+data2send['quantity'] = this.content.quantity;
+console.log(data2send);
+$http({url:"/newProduct",
+		 method: "POST",
+		 headers: {'Content-Type': 'application/json'},
+		data:JSON.stringify(data2send)})
+		.success(function(data, status) {
+			if (data)
+			{
+				$scope.content = null;
+				location.reload();
+			}
+        })
+
+};
+
+});
+
+app.controller('loadDrawers',function($scope, $http){
+console.log('cargando select');
+$http({url:"/ListDrawers",
+		 method: "POST",
+		 headers: {'Content-Type': 'application/json'},
+		 data:JSON.stringify(loadeduser)})
+		 .success(function (response) {
+		 $scope.drawersNumber = response;
+		 });
+});
+
+app.controller('getDrawersContent',function ($scope, $http){
+
+$http({url:"/List",
+		 method: "POST",
+		 headers: {'Content-Type': 'application/json'},
+		 data:JSON.stringify(loadeduser)})
+		 .success(function (response) {
+		 $scope.drawers = response;
+		 });
+})
+	</script>
+</body>  
+</html>  	
