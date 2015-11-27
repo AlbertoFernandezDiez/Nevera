@@ -1,7 +1,17 @@
 //Creamos la BD
 var sqlite3 = require('sqlite3').verbose(),
-db = new sqlite3.Database('fridge'),
+db = new sqlite3.Database('fridge.sqlite'),
 Fridge = {};
+
+//Creation ot the checksum function
+var crypto = require('crypto');
+
+function toSHA512(password) {
+	
+	return crypto.createHash('sha512').update(password).digest("hex");
+	
+}
+
 
 Fridge.createTables = function(){
 		db.run("CREATE TABLE IF NOT EXISTS  users (id INTEGER PRIMARY KEY  NOT NULL ,name VARCHAR NOT NULL ,password VARCHAR NOT NULL)");
@@ -20,7 +30,7 @@ Fridge.login = function(request, response){
 	
 	stmt = db.prepare("SELECT * FROM users WHERE name = ? and password = ?");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 	
 	stmt.get(function(error, row){
 		if(error){
@@ -46,7 +56,7 @@ Fridge.singin = function(request, response){
 	
 	stmt = db.prepare("SELECT * FROM users WHERE name = ? and password = ?");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 
 		stmt.get(function(error, row){
 		if(error){
@@ -61,7 +71,7 @@ Fridge.singin = function(request, response){
 			{
 					stmt = db.prepare("INSERT INTO users (name,password) VALUES (?,?)");
 	
-					stmt.bind(data.name, data.password);
+					stmt.bind(data.name, toSHA512(data.password));
 					
 					stmt.run(function(error,result){
 					if(error) 
@@ -90,7 +100,7 @@ Fridge.listItems = function(request, response){
 	
 	stmt = db.prepare("select drawer, product, quantity from users inner join content on users.id = content.userid and users.name = ? and users.password=? ");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 
 		stmt.all(function(error, row){
 		if(error){
@@ -118,7 +128,7 @@ Fridge.listDrawers = function(request, response){
 	
 	stmt = db.prepare("select drawer.drawer from users inner join drawer on users.id = drawer.userid and users.name = ? and users.password=? ");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 
 		stmt.all(function(error, row){
 		if(error){
@@ -147,7 +157,7 @@ Fridge.listDrawers = function(request, response){
 
 	stmt = db.prepare("SELECT * FROM users WHERE name = ? and password = ?");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 		stmt.get(function(error, row){
 			if(error){
 				throw error
@@ -197,7 +207,7 @@ Fridge.newProduct = function(request, response){
 	
 	stmt = db.prepare("SELECT * FROM users WHERE name = ? and password = ?");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 
 		stmt.get(function(error, row){
 		if(error){
@@ -251,7 +261,7 @@ Fridge.deleteProduct = function(request, response){
 	
 	stmt = db.prepare("SELECT * FROM users WHERE name = ? and password = ?");
 	
-	stmt.bind(data.name, data.password);
+	stmt.bind(data.name, toSHA512(data.password));
 
 		stmt.get(function(error, row){
 		if(error){
@@ -297,3 +307,4 @@ drawer = parseInt(drawer);
 }
 
 module.exports = Fridge;
+

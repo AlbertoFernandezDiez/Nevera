@@ -8,7 +8,7 @@
 	<script src="js/angular.min.js"></script>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-	
+	<script src="js/sha512.js"></script>
 </head>  
 <body>  
 	<div data-ng-app="myApp" class='container' data-ng-controller='getLoginData'>
@@ -21,7 +21,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>      
 		</button>
-      <a class="navbar-brand" href="#">Cajones</a>
+      <a class="pull-left" href="#"><span class="navbar-brand pull-right">Mis Cajones</span>	<img style="max-width:50px; max-height: 50px; margin-left:5px" src="img/logo.svg" ></a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
@@ -64,6 +64,14 @@
 	
 
 	<script>
+	
+	function toSHA512(password) {
+	var jsSha = new jsSHA(password);
+	var hash = jsSha.getHash("SHA-512", "HEX");
+
+	return hash;
+	}
+
 	var app = angular.module('myApp', [])
 app.controller('getLoginData', function ($scope, $http) {
      
@@ -81,6 +89,7 @@ var loadeduser = JSON.parse(localStorage.getItem('user'));
 	}
 	
 $scope.login = function (){
+$scope.user.password = toSHA512($scope.user.password)
 $http({url:"/LogIn",
 		 method: "POST",
 		 headers: {'Content-Type': 'application/json'},
@@ -90,6 +99,10 @@ $http({url:"/LogIn",
 		   {
 			localStorage.setItem('user',JSON.stringify($scope.user));
 			$scope.notlogged = false;
+			}
+			else
+			{
+			$scope.user = null;
 			}
         })
 
