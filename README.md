@@ -14,35 +14,35 @@ Conoce siempre el contenido de tus cajones con esta web de facil uso.
 
 #Uso de la API
 *Registrarse
-	*   http://192.168.1.236:3000/SignIN
+	*   URL:3000/SignIN
 	*	{"name":"`***Nombre***`","password":"`***hashedPassword***`","drawers":`***CantidadDeCajones***`}
 	*	respuesta
 		*	true el usuari se ha registrado
 		*	false no se ha podido registrar el usuario
 * Identificarte
-    *   http://192.168.1.236:3000/LogIn
+    *   URL:3000/LogIn
 	*	{"name":"`***Nombre***`","password":"`***hashedPassword***`"}
 	*	respuesta
 		*	true (el usuario y la contraseña son correctos)
 		*	false (usuario o contraseña incorrectos)
 *Listar contenido cajones
-	*	http://192.168.1.236:3000/List
+	*	URL:3000/List
 	*	{"name":"`***Nombre***`","password":"`***hashedPassword***`"}
 	*	respuesta:	
 		*	[{"drawer":`***NºDeCajon***`,"product":"`***NombreDeProducto***`","quantity":`***CantidadDeProducto***`},....]
 *Listar cajones
-	*	http://192.168.1.236:3000/ListDrawers
+	*	URL:3000/ListDrawers
 	*	{"name":"`***Nombre***`","password":"`***hashedPassword***`"}
 	*	respuesta:	
 		*	[{"drawer":`***NºDeCajon***`},{"drawer":`***NºDeCajon***`},....]
 *Añadir a cajon
-	*	http://192.168.1.236:3000/newProduct
+	*	URL:3000/newProduct
 	*	{"name":"`***Nombre***`","password":"`***hashedPassword***`","drawer":`***NºDeCajon***`,"product":"`***NombreDeProducto***`","quantity":`***CantidadDeProduct***`}
 	*	respuesta:	
 		*	true si se ha añadido correctamente
 		*	false si no ha sido posible añadir al cajón
 *Eliminar elemento
-	*	http://192.168.1.236:3000/delete
+	*	URL:3000/delete
 	*	{"name":"`***Nombre***`","password":"`***hashedPassword***`","drawer":`***NºDeCajon***`,"product":"`***NombreDeProducto***`"}
 	*	respuesta:	
 		*	true si se ha elimnado correctamente
