@@ -27,5 +27,4 @@ router.route('/newProduct')
 router.route('/delete')
 .post(ConexionBD.deleteProduct);
 
-router.route('/Add-Quit')
 }
